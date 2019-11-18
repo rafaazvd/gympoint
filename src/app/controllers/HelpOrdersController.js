@@ -58,7 +58,7 @@ class HelpOrdersController {
     const { helpOrderId } = req.params;
     const { answer } = req.body;
 
-    const helpOrder = await HelpOrder.findByPk(helpOrderId, {
+    const helpOrders = await HelpOrder.findByPk(helpOrderId, {
       attributes: { exclude: ['created_at', 'updated_at'] },
       include: [
         {
