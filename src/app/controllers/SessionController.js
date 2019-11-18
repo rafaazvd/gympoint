@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import Admin from '../models/Administrator';
 import authConfig from '../../config/auth';
 
-class AdministratorController {
+class SessionController {
   async store(req, res) {
     const schema = Yup.object().shape({
       email: Yup.string()
@@ -13,7 +13,7 @@ class AdministratorController {
       password: Yup.string().required(),
     });
     if (!(await schema.isValid(req.body))) {
-      return res.status(400).json({ error: 'validation fails' });
+      return res.status(402).json({ error: 'validation fails' });
     }
 
     const { email, password } = req.body;
@@ -39,4 +39,4 @@ class AdministratorController {
   }
 }
 
-export default new AdministratorController();
+export default new SessionController();
