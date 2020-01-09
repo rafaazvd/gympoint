@@ -2,6 +2,28 @@ import * as Yup from 'yup';
 import Plan from '../models/Plan';
 
 class PlanController {
+  async index(req, res) {
+    const { page = 1 } = req.query;
+
+    if (req.params.id) {
+      const plans = await Plan.findByPk(req.params.id, {
+        attributes: ['id', 'title', 'duration', 'price'],
+      });
+      return res.json(plans);
+    }
+
+    const plans = await Plan.findAll({
+      order: ['duration'],
+      limit: 10,
+      offset: (page - 1) * 10,
+      attributes: ['id', 'title', 'duration', 'price'],
+    });
+    if (!plans) {
+      res.status(400).json({ error: 'not exists plans' });
+    }
+    return res.json(plans);
+  }
+
   async store(req, res) {
     const schema = Yup.object().shape({
       title: Yup.string().required(),
@@ -33,23 +55,6 @@ class PlanController {
       created_at,
       updated_at,
     });
-  }
-
-  async index(req, res) {
-    const plan = await Plan.findAll({
-      attributes: [
-        'id',
-        'title',
-        'duration',
-        'price',
-        'created_at',
-        'updated_at',
-      ],
-    });
-    if (!plan) {
-      res.status(400).json({ error: 'not exists plans' });
-    }
-    return res.json(plan);
   }
 
   async update(req, res) {

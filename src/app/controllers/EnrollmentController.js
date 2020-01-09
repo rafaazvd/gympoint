@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 import { format, addMonths, parseISO, isBefore } from 'date-fns';
 import pt from 'date-fns/locale/pt';
+import { Op } from 'sequelize';
 import Enrollment from '../models/Enrollment';
 import Plan from '../models/Plan';
 import Students from '../models/Students';
@@ -77,24 +78,45 @@ class EnrollmentController {
   }
 
   async index(req, res) {
-    const { page = 1 } = req.query;
+    const { query } = req.query;
+    const page = parseInt(req.query.page || 1, 10);
+    if (query) {
+      const enrollment = await Enrollment.findAndCountAll({
+        order: ['created_at'],
+        where: {
+          [Op.or]: [
+            {
+              '$students.name$': {
+                [Op.iLike]: `%${query}%`,
+              },
+            },
+            {
+              '$plan.title$': {
+                [Op.iLike]: `%${query}%`,
+              },
+            },
+          ],
+        },
+        include: [
+          {
+            model: Students,
+            as: 'student',
+            attributes: ['id', 'name', 'email'],
+          },
+          {
+            model: Plan,
+            as: 'plan',
+            attributes: ['id', 'title'],
+          },
+        ],
+        limit: 15,
+        offset: (page - 1) * 15,
+      });
+      return res.json(enrollment);
+    }
+
     const enrollment = await Enrollment.findAll({
-      order: ['created_at'],
-      attributes: ['id', 'start_date', 'end_date', 'price'],
-      include: [
-        {
-          model: Students,
-          as: 'student',
-          attributes: ['id', 'name', 'email'],
-        },
-        {
-          model: Plan,
-          as: 'plans',
-          attributes: ['id', 'title'],
-        },
-      ],
-      limit: 20,
-      offset: (page - 1) * 20,
+      attributes: ['id', 'start_date', 'end_date', 'price', 'active'],
     });
     return res.json(enrollment);
   }

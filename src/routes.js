@@ -22,9 +22,8 @@ routes.get('/students/:studentId/checkins', CheckinsController.index);
 routes.post('/help-orders/:studentId', HelpOrdersController.store);
 routes.get('/help-orders/:studentId', HelpOrdersController.index);
 
-
-//auth admin
-routes.use(authMiddleware);
+// auth admin
+// routes.use(authMiddleware);
 
 routes.post('/admin', AdministratorController.store);
 routes.put('/admin', AdministratorController.update);
@@ -32,9 +31,7 @@ routes.put('/admin', AdministratorController.update);
 routes.get('/questions', AnswerController.index);
 routes.put('/answer/:helpOrderId', HelpOrdersController.update);
 
-
 routes.post('/students', StudentsController.store);
-routes.post('/test', Test.store);
 
 routes.put('/students', StudentsController.update);
 routes.delete('/students', StudentsController.delete);

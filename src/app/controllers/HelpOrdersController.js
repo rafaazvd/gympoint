@@ -14,31 +14,36 @@ class HelpOrdersController {
     if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: 'Validation fails' });
     }
-      const { studentId } = req.params;
-      const enrollment = Enrollment.findOne({
-        where:{student_id: studentId}
-      });
-      if (!enrollment){
-        return res.status(400).json({ error: 'Only registered users may request assistance' });
-      }
-      const {question} = req.body;
-      const {id} = HelpOrders.create({
-        student_id: studentId,
-        question,
-      })
-      return res.json({id, studentId, question});
-    }
-  async index(req, res) {
-    const {studentId} = req.params;
-    const {page = 1} = req.query;
-    const assistanceExists = HelpOrders.findAll({
-      where: {student_id: studentId}
+    const { studentId } = req.params;
+    const enrollment = Enrollment.findOne({
+      where: { student_id: studentId },
     });
-    if (!assistanceExists){
-      return res.status(400).json({error:'aid messages not recorded by this student!'})
+    if (!enrollment) {
+      return res
+        .status(400)
+        .json({ error: 'Only registered users may request assistance' });
+    }
+    const { question } = req.body;
+    const { id } = HelpOrders.create({
+      student_id: studentId,
+      question,
+    });
+    return res.json({ id, studentId, question });
+  }
+
+  async index(req, res) {
+    const { studentId } = req.params;
+    const { page = 1 } = req.query;
+    const assistanceExists = HelpOrders.findAll({
+      where: { student_id: studentId },
+    });
+    if (!assistanceExists) {
+      return res
+        .status(400)
+        .json({ error: 'aid messages not recorded by this student!' });
     }
     const helpOrders = HelpOrders.findAll({
-      where:{student_id: studentId},
+      where: { student_id: studentId },
       order: ['created_at'],
       attributes: ['id', 'question', 'answer', 'answer_at'],
       limit: 10,
@@ -46,6 +51,7 @@ class HelpOrdersController {
     });
     return res.json(helpOrders);
   }
+
   async update(req, res) {
     const schema = Yup.object().shape({
       answer: Yup.string(),
@@ -58,7 +64,7 @@ class HelpOrdersController {
     const { helpOrderId } = req.params;
     const { answer } = req.body;
 
-    const helpOrders = await HelpOrder.findByPk(helpOrderId, {
+    const helpOrders = await HelpOrders.findByPk(helpOrderId, {
       attributes: { exclude: ['created_at', 'updated_at'] },
       include: [
         {

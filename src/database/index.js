@@ -1,15 +1,15 @@
 import Sequelize from 'sequelize';
 
 import Admin from '../app/models/Administrator';
-import Students from '../app/models/Students';
+import Student from '../app/models/Students';
 import Plan from '../app/models/Plan';
 import Enrollment from '../app/models/Enrollment';
-import Test from '../app/models/Test';
-import Checkins from '../app/models/Checkins';
+import Checkin from '../app/models/Checkins';
+import HelpOrder from '../app/models/HelpOrders';
 
 import databaseConfig from '../config/database';
 
-const models = [Test, Plan, Students, Admin, Enrollment, Checkins];
+const models = [Admin, Student, Plan, Enrollment, Checkin, HelpOrder];
 
 class Database {
   constructor() {
@@ -18,6 +18,7 @@ class Database {
 
   init() {
     this.connection = new Sequelize(databaseConfig);
+
     models
       .map(model => model.init(this.connection))
       .map(model => model.associate && model.associate(this.connection.models));
